@@ -2,42 +2,89 @@ import Constants from './constants.js'
 
 let l = console.log
 
-let actions = {
-	userGetData(id){
-		l('userGetData')
 
-		return {
-			type: Constants.USER_GET_DATA,
-			payload: id
-		}
-	},
 
-	userGetDataSuccess(data){
-		l('userGetDataSuccess')
-		l(data)
 
-		return {
-			type: Constants.USER_GET_DATA_SUCCESS,
-			payload: data
-		}
-	},
-
-	userGetDataFail(error){
-		l('userGetDataFail')
-		//l(error)
-
-		return {
-			type: Constants.USER_GET_DATA_FAIL,
-			payload: error,
-		}
-	},
-
-	userChangeId(id){
-		return {
-			type: Constants.USER_CHANGE_ID,
-			payload: id,
-		}
+let userDataIsLoading = () => {
+	return {
+		type: Constants.USER_GET_DATA
 	}
 }
 
-export default actions
+let userGetDataSuccess = (data) => {
+	return {
+		type: Constants.USER_GET_DATA_SUCCESS,
+		payload: data
+	}
+}
+
+let userGetDataFail = (error) => {
+	return {
+		type: Constants.USER_GET_DATA_FAIL,
+		payload: error,
+	}
+}
+
+export let userGetData = (id) => {
+	return (dispatch) => {
+		dispatch(userDataIsLoading())
+
+		fetch(`user/data/${id}`, {method: 'GET'})
+			.then( res => {
+				if(!res.ok) throw res
+				return res					
+			})
+			.then( res => res.json())
+			.then( data => dispatch(userGetDataSuccess(data)) )
+			.catch( 
+				error => error.text().then(errorText =>  dispatch(userGetDataFail(errorText)) )
+			)
+	}
+}
+
+export let userChangeId = (id) => {
+	return {
+		type: Constants.USER_CHANGE_ID,
+		payload: id
+	}
+}
+
+
+let imgIsLoading = () => {
+	return {
+		type : Constants.IMG_RELOAD
+	}
+}
+
+let imgReloadSuccess = (data) => {
+	return {
+		type: Constants.IMG_RELOAD_SUCCESS,
+		payload: data
+	}
+}
+
+let imgReloadFail = (error) => {
+	return{
+		type: Constants.IMG_RELOAD_FAIL,
+		payload: error
+	}
+}
+
+export let imgReload = () => {
+	return (dispatch) => {
+		dispatch( imgIsLoading() )
+
+		fetch('img-load', {method: 'GET'})
+			.then(res => {
+				if( !res.ok ) throw res
+				return res.json()	
+			})
+			.then( data => dispatch(imgReloadSuccess(data)))
+			.catch( error => {
+				error.text && error.text().then(errorText => dispatch(imgReloadFail(errorText)))
+				l(error)
+			})
+
+	}
+}
+

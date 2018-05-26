@@ -1,47 +1,42 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import actions from '../redux/actions.js'
+import { userGetData, userChangeId } from '../redux/actions.js'
 
-let { userGetData, userGetDataSuccess, userGetDataFail, userChangeId } = actions
-
-let fetchUserData = (dispatch, id) => {
-	dispatch( userGetData() )
-	return fetch(`user/data/${id}`, {method : 'GET'})
-		.then( res => { 
-			if(!res.ok) throw res
-			return res.json() 
-		})
-		.then(
-			data => dispatch( userGetDataSuccess(data) ),
-		)
-		.catch(
-			err => { 
-				return err.text().then( errText => dispatch( userGetDataFail(errText) ))
-			}
-		)
-}
-
-let changeId = (dispatch, id) => {
-	dispatch( userChangeId(id) )
-}
 
 class Main extends Component {
-	render() {
-		l(this.props)
+	state = {
+		id: undefined
+	}
 
-		let { name, age, loading, id, getUserData, changeId, error } = this.props
+	componentDidMount(){
+		let { id, userGetData } = this.props
+		this.state.id = id // dont need setState
+		userGetData(id)
+	}
+
+	componentWillReceiveProps(nextProps){
+		if(nextProps.id != this.state.id){
+
+			this.state.id = nextProps.id // dont need setState
+			this.props.userGetData(nextProps.id)
+		}
+	}
+
+	render() {
+		//l(this.props)
+
+		let { name, age, loading, id, changeId, error } = this.props
 
 		if(error) l(error)
 
 		return (
 			<div>
-				{ ( id != 'id_1') && <button onClick={() => {changeId('id_1')}}> change to id_1 </button> }
-				{ ( id != 'id_2') && <button onClick={() => {changeId('id_2')}}> change to id_2 </button> }
-				{ ( id != 'id_3') && <button onClick={() => {changeId('id_3')}}> change to id_3 </button> }
+				{ ( id != 'id_1') && <button onClick={() => {!loading && changeId('id_1')}}> change to id_1 </button> }
+				{ ( id != 'id_2') && <button onClick={() => {!loading && changeId('id_2')}}> change to id_2 </button> }
+				{ ( id != 'id_3') && <button onClick={() => {!loading && changeId('id_3')}}> change to id_3 </button> }
 
 				<hr />
 
-				{ (!name && !age) && <button onClick={() => {getUserData(id)}}>Get User Data</button> }
 				{ name && <h3>{name}</h3> }
 				{ age && <h4>{age}</h4> }
 				{ loading && <i> loading... </i>}
@@ -60,8 +55,8 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
 	return {
-		getUserData: (id) => { fetchUserData(dispatch, id) },
-		changeId: (id) => { changeId(dispatch, id) } 
+		userGetData: (id) => { dispatch(userGetData(id)) },
+		changeId: (id) => { dispatch(userChangeId(id)) } 
 	}
 }
 
