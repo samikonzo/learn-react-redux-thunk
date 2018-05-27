@@ -1,7 +1,15 @@
 import { createStore, applyMiddleware } from 'redux'
-import thunk from 'redux-thunk'
 import rootReducer from './reducers.js'
+import createSagaMiddleware from 'redux-saga'
+import  { watherSaga}  from './sagas.js'
 
-let store = createStore(rootReducer, applyMiddleware(thunk))
+const sagaMiddleware = createSagaMiddleware()
+
+
+let store = createStore(rootReducer, applyMiddleware(sagaMiddleware))
+
+sagaMiddleware.run(watherSaga)
+
+
 
 export default store

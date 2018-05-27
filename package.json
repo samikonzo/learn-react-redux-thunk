@@ -23,6 +23,7 @@
     "node-fetch": "^2.1.2",
     "nodemon": "^1.17.5",
     "react-router-dom": "^4.2.2",
+    "redux-saga": "^0.16.0",
     "redux-thunk": "^2.2.0",
     "style-loader": "^0.21.0",
     "webpack": "^4.8.3",
